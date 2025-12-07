@@ -259,6 +259,7 @@ const SnowFloor = () => {
 export const Step5ChristmasTree = () => {
   const [litState, setLitState] = useState({ star: false, top: false, mid: false, bottom: false, gifts: false })
   const [isFullyLit, setIsFullyLit] = useState(false)
+  const [showModal, setShowModal] = useState(false)
 
   const handleLightUp = (part: keyof typeof litState) => {
     if (litState[part]) return // 已经点亮就不重复触发
@@ -269,6 +270,7 @@ export const Step5ChristmasTree = () => {
     // Check if all lit
     if (Object.values(newState).every(v => v)) {
         setIsFullyLit(true)
+        setShowModal(true)
         triggerFinalCelebration()
     } else {
         // 小庆祝
@@ -391,14 +393,24 @@ export const Step5ChristmasTree = () => {
         />
       </Canvas>
       
-      {isFullyLit && (
+      {showModal && (
         <motion.div 
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, type: "spring" }}
             className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
         >
-            <div className="bg-black/60 backdrop-blur-md p-12 rounded-4xl border border-white/10 text-center shadow-2xl">
+            <div className="bg-black/60 backdrop-blur-md p-12 rounded-4xl border border-white/10 text-center shadow-2xl relative pointer-events-auto">
+                <button 
+                    onClick={() => setShowModal(false)}
+                    className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+                    aria-label="Close"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
                 <h1 className="text-7xl font-bold text-white mb-6 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)]">
                     Happy New Year 2026!
                 </h1>
@@ -408,9 +420,9 @@ export const Step5ChristmasTree = () => {
                 <div className="flex gap-4 justify-center">
                     <button 
                         className="px-8 py-4 bg-linear-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white rounded-full font-bold pointer-events-auto transition-all transform hover:scale-105 shadow-lg text-lg"
-                        onClick={() => window.location.reload()}
+                        onClick={() => setShowModal(false)}
                     >
-                        再许一愿
+                        开启新年好运！
                     </button>
                 </div>
             </div>
