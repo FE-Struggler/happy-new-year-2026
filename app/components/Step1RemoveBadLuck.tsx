@@ -268,11 +268,11 @@ export const Step1RemoveBadLuck = () => {
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-between p-8 overflow-hidden">
       <div className="text-center mt-10 z-10 pointer-events-none">
-        <h2 className="text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-slate-600 to-slate-800 drop-shadow-sm tracking-wider">
-          丢掉霉运
+        <h2 className="text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-red-600 to-pink-600 drop-shadow-sm tracking-wider">
+          2025年辛苦了
         </h2>
-        <p className="text-slate-600 mt-3 text-lg font-medium tracking-wide">
-          把这些令人讨厌的家伙拖进粉碎机里！
+        <p className="text-red-700/80 mt-3 text-lg font-medium tracking-wide">
+          首先让我们丢掉霉运，把这些令人讨厌的家伙拖进粉碎机里！
         </p>
       </div>
 

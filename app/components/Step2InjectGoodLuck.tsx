@@ -169,7 +169,7 @@ export const Step2InjectGoodLuck = () => {
         <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-linear-to-r from-yellow-600 to-orange-500 drop-shadow-sm">
           第二步：注入好运
         </h2>
-        <p className="text-yellow-700/80 mt-2">描摹屏幕上的字母，注入好运</p>
+        <p className="text-yellow-700/80 mt-2">点亮屏幕上的字母，注入好运吧！</p>
       </div>
 
       {/* Guide Layer: Dotted LUCK */}
