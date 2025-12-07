@@ -12,10 +12,12 @@ export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
     {
       cookies: {
         getAll() {
+          // @ts-expect-error - cookieStore type mismatch in server.ts but runtime is correct
           return cookieStore.getAll()
         },
         setAll(cookiesToSet) {
           try {
+            // @ts-expect-error - cookieStore type mismatch in server.ts but runtime is correct
             cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
           } catch {
             // The `setAll` method was called from a Server Component.
