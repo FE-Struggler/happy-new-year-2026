@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store/useStore'
 import { Plus, Check, Sparkles } from 'lucide-react'
@@ -14,15 +14,55 @@ const COLORS = [
 ]
 
 export const Step3WishList = () => {
-  const { wishes, addWish, setStep, unlockStep } = useStore()
+  const { wishes, addWish, setStep, unlockStep, userName, setWishes } = useStore()
   const [isInputVisible, setIsInputVisible] = useState(false)
   const [currentWish, setCurrentWish] = useState('')
 
-  const handleAddWish = () => {
+  useEffect(() => {
+    const fetchWishes = async () => {
+      if (!userName) return
+      
+      try {
+        const response = await fetch(`/api/wish?name=${encodeURIComponent(userName)}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.wishes && Array.isArray(data.wishes)) {
+            const currentWishes = useStore.getState().wishes
+            const mergedWishes = Array.from(new Set([...currentWishes, ...data.wishes]))
+            setWishes(mergedWishes)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch wishes:', error)
+      }
+    }
+
+    fetchWishes()
+  }, [userName, setWishes])
+
+  const handleAddWish = async () => {
     if (!currentWish.trim()) return
-    addWish(currentWish)
+    const wishToSave = currentWish.trim()
+    
+    // Optimistic UI update
+    addWish(wishToSave)
     setCurrentWish('')
     setIsInputVisible(false)
+    
+    // Save to Supabase via API
+    try {
+      if (userName) {
+        await fetch('/api/wish', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name: userName, wish: wishToSave }),
+        })
+      }
+    } catch (error) {
+      console.error('Error saving wish to Supabase:', error)
+    }
     
     // Check if enough wishes to proceed (e.g., 3)
     if (wishes.length + 1 >= 3) {
@@ -52,7 +92,7 @@ export const Step3WishList = () => {
         <div className="flex flex-wrap gap-6 justify-center content-start min-h-full">
             <AnimatePresence>
             {wishes.map((wish, index) => {
-                const rotation = Math.random() * 10 - 5 // Random rotation between -5 and 5
+                const rotation = (index * 7) % 10 - 5 // Deterministic rotation
                 const colorClass = COLORS[index % COLORS.length]
                 
                 return (

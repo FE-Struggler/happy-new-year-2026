@@ -7,11 +7,12 @@ import { Step2InjectGoodLuck } from './components/Step2InjectGoodLuck'
 import { Step3WishList } from './components/Step3WishList'
 import { Step4LuckyWheel } from './components/Step4LuckyWheel'
 import { Step5ChristmasTree } from './components/Step5ChristmasTree'
+import Login from './components/Login'
 import { useStore } from './store/useStore'
 import { DebugPanel } from './components/DebugPanel'
 
 export default function Home() {
-  const { currentStep, unlockedSteps, setStep } = useStore()
+  const { currentStep, unlockedSteps, setStep, userName } = useStore()
 
   const steps = [
     { id: 1, component: Step1RemoveBadLuck, title: '抽走霉运' },
@@ -26,22 +27,26 @@ export default function Home() {
       <ImmersiveBackground />
 
       <AnimatePresence mode="wait">
-        <motion.div
-          key={currentStep}
-          initial={{ opacity: 0, y: 50, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -50, scale: 1.05 }}
-          transition={{ duration: 0.5, ease: 'easeInOut' }}
-          className="w-full h-full relative z-10"
-        >
-          {steps.map((step) => {
-            if (step.id === currentStep) {
-              const Component = step.component
-              return <Component key={step.id} />
-            }
-            return null
-          })}
-        </motion.div>
+        {!userName ? (
+          <Login key="login" />
+        ) : (
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -50, scale: 1.05 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="w-full h-full relative z-10"
+          >
+            {steps.map((step) => {
+              if (step.id === currentStep) {
+                const Component = step.component
+                return <Component key={step.id} />
+              }
+              return null
+            })}
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* Navigation Indicator - Removed as requested */}
