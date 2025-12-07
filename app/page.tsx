@@ -8,6 +8,7 @@ import { Step3WishList } from './components/Step3WishList'
 import { Step4LuckyWheel } from './components/Step4LuckyWheel'
 import { Step5ChristmasTree } from './components/Step5ChristmasTree'
 import { useStore } from './store/useStore'
+import { DebugPanel } from './components/DebugPanel'
 
 export default function Home() {
   const { currentStep, unlockedSteps, setStep } = useStore()
@@ -44,6 +45,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/* Navigation Indicator - Removed as requested */}
+      <DebugPanel />
     </main>
   )
 }
