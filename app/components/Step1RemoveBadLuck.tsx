@@ -211,10 +211,39 @@ export const Step1RemoveBadLuck = () => {
       dropPoint.y >= shredderRect.top - 80
     ) {
       // Shredded!
+      shredItem(id, itemColors)
+    }
+  }
+
+  const shredItem = (id: number, itemColors: string[]) => {
+      const shredderRect = shredderRef.current?.getBoundingClientRect()
+      if (!shredderRect) return
+      
       removeItem(id)
       triggerShredEffect(shredderRect.left + shredderRect.width / 2, shredderRect.top + 50, itemColors)
       shakeShredder()
-    }
+  }
+
+  const handleOneClickDelete = async () => {
+      setShredderState('eating')
+      
+      // Animate all items to shredder
+      const shredderRect = shredderRef.current?.getBoundingClientRect()
+      if (!shredderRect) return
+
+      // We need to trigger this sequentially or all at once with a small delay
+      // Since items are removed from state, we should copy them first
+      const itemsToShred = [...items]
+      
+      // Iterate and simulate shredding
+      for (let i = 0; i < itemsToShred.length; i++) {
+          const item = itemsToShred[i]
+          
+          await new Promise(r => setTimeout(r, 150))
+          shredItem(item.id, item.color)
+      }
+      
+      setShredderState('idle')
   }
 
   const shakeShredder = async () => {
@@ -353,66 +382,77 @@ export const Step1RemoveBadLuck = () => {
         </AnimatePresence>
       </div>
 
-      {/* Cartoon Shredder */}
-      <motion.div
-        ref={shredderRef}
-        animate={shredderControls}
-        className="relative w-72 h-48 z-10 flex flex-col items-center justify-end mb-8"
-      >
-         {/* Shredder Monster Body */}
-        <div className="relative w-full h-40 bg-linear-to-b from-slate-700 to-slate-900 rounded-t-[3rem] border-4 border-slate-600 shadow-[0_0_50px_rgba(0,0,0,0.6)] flex flex-col items-center overflow-hidden">
-            
-            {/* Eyes */}
-            <div className="flex gap-8 mt-6 z-20">
-                <motion.div 
-                    animate={{ scaleY: shredderState === 'eating' ? 0.2 : 1 }}
-                    className="w-10 h-10 bg-yellow-400 rounded-full border-4 border-slate-800 flex items-center justify-center relative overflow-hidden"
-                >
-                    <div className="w-3 h-3 bg-black rounded-full translate-x-1" />
-                </motion.div>
-                <motion.div 
-                    animate={{ scaleY: shredderState === 'eating' ? 0.2 : 1 }}
-                    className="w-10 h-10 bg-yellow-400 rounded-full border-4 border-slate-800 flex items-center justify-center relative overflow-hidden"
-                >
-                    <div className="w-3 h-3 bg-black rounded-full translate-x-1" />
-                </motion.div>
-            </div>
-
-            {/* Mouth / Inlet */}
-            <motion.div 
-                animate={{ 
-                    height: shredderState === 'eating' ? 50 : 20,
-                    width: shredderState === 'eating' ? 180 : 120,
-                    borderRadius: shredderState === 'eating' ? '20px' : '40px'
-                }}
-                className="mt-6 bg-red-900 border-4 border-slate-800 relative overflow-hidden shadow-inner transition-all duration-300"
-            >
-                {/* Teeth */}
-                <div className="absolute top-0 left-0 w-full flex justify-between px-2">
-                    {Array.from({length: 6}).map((_, i) => (
-                        <div key={i} className="w-4 h-4 bg-gray-200 rotate-45 -translate-y-2 border border-gray-400" />
-                    ))}
-                </div>
-                 <div className="absolute bottom-0 left-0 w-full flex justify-between px-2">
-                    {Array.from({length: 6}).map((_, i) => (
-                        <div key={i} className="w-4 h-4 bg-gray-200 rotate-45 translate-y-2 border border-gray-400" />
-                    ))}
-                </div>
+      {/* Cartoon Shredder Container */}
+      <div className="relative z-10 flex flex-col items-center mb-8">
+        <motion.div
+            ref={shredderRef}
+            animate={shredderControls}
+            className="relative w-72 h-48 flex flex-col items-center justify-end"
+        >
+             {/* Shredder Monster Body */}
+            <div className="relative w-full h-40 bg-linear-to-b from-slate-700 to-slate-900 rounded-t-[3rem] border-4 border-slate-600 shadow-[0_0_50px_rgba(0,0,0,0.6)] flex flex-col items-center overflow-hidden">
                 
-                {/* Throat Gradient */}
-                <div className="absolute inset-0 bg-linear-to-b from-transparent to-black opacity-80" />
-            </motion.div>
+                {/* Eyes */}
+                <div className="flex gap-8 mt-6 z-20">
+                    <motion.div 
+                        animate={{ scaleY: shredderState === 'eating' ? 0.2 : 1 }}
+                        className="w-10 h-10 bg-yellow-400 rounded-full border-4 border-slate-800 flex items-center justify-center relative overflow-hidden"
+                    >
+                        <div className="w-3 h-3 bg-black rounded-full translate-x-1" />
+                    </motion.div>
+                    <motion.div 
+                        animate={{ scaleY: shredderState === 'eating' ? 0.2 : 1 }}
+                        className="w-10 h-10 bg-yellow-400 rounded-full border-4 border-slate-800 flex items-center justify-center relative overflow-hidden"
+                    >
+                        <div className="w-3 h-3 bg-black rounded-full translate-x-1" />
+                    </motion.div>
+                </div>
 
-            {/* Label */}
-            <div className="mt-auto mb-2 px-4 py-1 bg-slate-800 rounded text-[10px] text-slate-400 font-mono border border-slate-600">
-                霉运垃圾桶
+                {/* Mouth / Inlet */}
+                <motion.div 
+                    animate={{ 
+                        height: shredderState === 'eating' ? 50 : 20,
+                        width: shredderState === 'eating' ? 180 : 120,
+                        borderRadius: shredderState === 'eating' ? '20px' : '40px'
+                    }}
+                    className="mt-6 bg-red-900 border-4 border-slate-800 relative overflow-hidden shadow-inner transition-all duration-300"
+                >
+                    {/* Teeth */}
+                    <div className="absolute top-0 left-0 w-full flex justify-between px-2">
+                        {Array.from({length: 6}).map((_, i) => (
+                            <div key={i} className="w-4 h-4 bg-gray-200 rotate-45 -translate-y-2 border border-gray-400" />
+                        ))}
+                    </div>
+                     <div className="absolute bottom-0 left-0 w-full flex justify-between px-2">
+                        {Array.from({length: 6}).map((_, i) => (
+                            <div key={i} className="w-4 h-4 bg-gray-200 rotate-45 translate-y-2 border border-gray-400" />
+                        ))}
+                    </div>
+                    
+                    {/* Throat Gradient */}
+                    <div className="absolute inset-0 bg-linear-to-b from-transparent to-black opacity-80" />
+                </motion.div>
+
+                {/* Label */}
+                <div className="mt-auto mb-2 px-4 py-1 bg-slate-800 rounded text-[10px] text-slate-400 font-mono border border-slate-600">
+                    霉运垃圾桶
+                </div>
+
+                {/* Decoration */}
+                <div className="absolute bottom-10 -right-6 w-12 h-24 bg-slate-600 rotate-12 rounded-lg border-2 border-slate-500 z-0" />
+                <div className="absolute bottom-8 -left-6 w-10 h-20 bg-slate-600 -rotate-12 rounded-lg border-2 border-slate-500 z-0" />
             </div>
-
-            {/* Decoration */}
-            <div className="absolute bottom-10 -right-6 w-12 h-24 bg-slate-600 rotate-12 rounded-lg border-2 border-slate-500 z-0" />
-            <div className="absolute bottom-8 -left-6 w-10 h-20 bg-slate-600 -rotate-12 rounded-lg border-2 border-slate-500 z-0" />
-        </div>
-      </motion.div>
+        </motion.div>
+        
+        {items.length > 0 && (
+            <button
+                onClick={handleOneClickDelete}
+                className="mt-4 px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-lg transition-colors border-2 border-red-800 z-50 cursor-pointer"
+            >
+                一键删除
+            </button>
+        )}
+      </div>
     </div>
   )
 }

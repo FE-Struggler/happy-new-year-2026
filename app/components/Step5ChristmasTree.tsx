@@ -13,6 +13,7 @@ import {
 import * as THREE from 'three'
 import { motion } from 'framer-motion'
 import confetti from 'canvas-confetti'
+import { useStore } from '../store/useStore'
 
 // --- Utility Components ---
 
@@ -260,6 +261,7 @@ export const Step5ChristmasTree = () => {
   const [litState, setLitState] = useState({ star: false, top: false, mid: false, bottom: false, gifts: false })
   const [isFullyLit, setIsFullyLit] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const { userName } = useStore()
 
   const handleLightUp = (part: keyof typeof litState) => {
     if (litState[part]) return // 已经点亮就不重复触发
@@ -400,10 +402,10 @@ export const Step5ChristmasTree = () => {
             transition={{ duration: 0.8, type: "spring" }}
             className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
         >
-            <div className="bg-black/60 backdrop-blur-md p-12 rounded-4xl border border-white/10 text-center shadow-2xl relative pointer-events-auto">
+            <div className="bg-black/60 backdrop-blur-md p-12 rounded-4xl border border-white/10 text-center shadow-2xl relative pointer-events-auto max-w-2xl mx-4">
                 <button 
                     onClick={() => setShowModal(false)}
-                    className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+                    className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors cursor-pointer"
                     aria-label="Close"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -411,15 +413,17 @@ export const Step5ChristmasTree = () => {
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                 </button>
-                <h1 className="text-7xl font-bold text-white mb-6 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)]">
-                    Happy New Year 2026!
+                <h1 className="text-5xl md:text-6xl font-bold text-white mb-8 drop-shadow-[0_0_25px_rgba(255,215,0,0.6)] leading-tight">
+                    {userName ? `${userName}，` : ''} <br/> 祝你2026新年快乐！
                 </h1>
-                <p className="text-3xl text-gray-100 font-light tracking-wide mb-8">
-                    愿星光照亮前路，幸福常伴左右
-                </p>
+                <div className="text-xl md:text-2xl text-gray-100 font-light tracking-wide mb-10 leading-loose">
+                    <p>新的一年，愿你眼中有光，心中有爱。</p>
+                    <p>所有的遗憾都是惊喜的铺垫，</p>
+                    <p>所有的坚持终将迎来花开。</p>
+                </div>
                 <div className="flex gap-4 justify-center">
                     <button 
-                        className="px-8 py-4 bg-linear-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white rounded-full font-bold pointer-events-auto transition-all transform hover:scale-105 shadow-lg text-lg"
+                        className="px-10 py-4 bg-linear-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white rounded-full font-bold pointer-events-auto transition-all transform hover:scale-105 shadow-lg text-xl"
                         onClick={() => setShowModal(false)}
                     >
                         开启新年好运！
