@@ -10,6 +10,7 @@ import {
   MeshReflectorMaterial,
   SpotLight
 } from '@react-three/drei'
+import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import { motion } from 'framer-motion'
 import confetti from 'canvas-confetti'
@@ -43,9 +44,9 @@ const Ornaments = ({ count, radius, isLit }: { count: number, radius: number, is
           <meshStandardMaterial 
             color={o.color} 
             emissive={isLit ? o.color : '#000000'}
-            emissiveIntensity={isLit ? 0.8 : 0}
-            roughness={0.2}
-            metalness={0.8}
+            emissiveIntensity={isLit ? 2 : 0}
+            roughness={0.1}
+            metalness={0.9}
           />
         </mesh>
       ))}
@@ -82,8 +83,9 @@ const AdvancedTreeLayer = ({ position, scale, isLit, onClick, ornamentCount = 6 
         <meshStandardMaterial
           color={isLit ? '#2dc937' : '#2E8B57'} // Unlit: Dark Green -> SeaGreen
           emissive={isLit ? '#0f3a15' : '#001100'}
-          emissiveIntensity={isLit ? 0.6 : 0.1}
-          roughness={0.6}
+          emissiveIntensity={isLit ? 0.4 : 0.1}
+          roughness={0.4}
+          metalness={0.1}
           flatShading
         />
       </mesh>
@@ -93,7 +95,8 @@ const AdvancedTreeLayer = ({ position, scale, isLit, onClick, ornamentCount = 6 
          <coneGeometry args={[1, 2, 8]} />
          <meshStandardMaterial
           color={isLit ? '#3ddb4a' : '#3CB371'} // Unlit: Darker -> MediumSeaGreen
-          roughness={0.8}
+          roughness={0.6}
+          metalness={0.1}
           flatShading
         />
       </mesh>
@@ -128,9 +131,9 @@ const Star = ({ isLit, onClick }: any) => {
         <meshStandardMaterial
           color={isLit ? '#ffd700' : '#887000'}
           emissive={isLit ? '#ffd700' : '#000000'}
-          emissiveIntensity={isLit ? 2 : 0}
-          metalness={0.5}
-          roughness={0.2}
+          emissiveIntensity={isLit ? 4 : 0}
+          metalness={1}
+          roughness={0}
         />
       </mesh>
       {isLit && (
@@ -151,7 +154,7 @@ const Gifts = ({ isLit, onClick }: any) => {
       {/* Gift 1 */}
       <mesh position={[1.2, 0.4, 1.2]} rotation={[0, 0.5, 0]} castShadow>
         <boxGeometry args={[0.8, 0.8, 0.8]} />
-        <meshStandardMaterial color={isLit ? '#ff0000' : '#550000'} emissive={isLit ? '#500' : '#000'} emissiveIntensity={isLit ? 0.2 : 0} roughness={0.3} />
+        <meshStandardMaterial color={isLit ? '#ff0000' : '#550000'} emissive={isLit ? '#ff0000' : '#000'} emissiveIntensity={isLit ? 0.5 : 0} roughness={0.3} />
       </mesh>
       <mesh position={[1.2, 0.4, 1.2]} rotation={[0, 0.5, 0]}>
          <boxGeometry args={[0.82, 0.82, 0.1]} />
@@ -161,7 +164,7 @@ const Gifts = ({ isLit, onClick }: any) => {
       {/* Gift 2 */}
       <mesh position={[-1.2, 0.3, 0.5]} rotation={[0, -0.2, 0]} castShadow>
         <boxGeometry args={[0.6, 0.6, 0.6]} />
-        <meshStandardMaterial color={isLit ? '#0000ff' : '#000055'} emissive={isLit ? '#005' : '#000'} emissiveIntensity={isLit ? 0.2 : 0} roughness={0.3} />
+        <meshStandardMaterial color={isLit ? '#0000ff' : '#000055'} emissive={isLit ? '#0000ff' : '#000'} emissiveIntensity={isLit ? 0.5 : 0} roughness={0.3} />
       </mesh>
       <mesh position={[-1.2, 0.3, 0.5]} rotation={[0, -0.2, 0]}>
          <boxGeometry args={[0.1, 0.62, 0.62]} />
@@ -171,7 +174,7 @@ const Gifts = ({ isLit, onClick }: any) => {
        {/* Gift 3 */}
        <mesh position={[0.2, 0.25, 1.8]} rotation={[0, 0.2, 0]} castShadow>
         <boxGeometry args={[0.5, 0.5, 0.5]} />
-        <meshStandardMaterial color={isLit ? '#ff00ff' : '#550055'} emissive={isLit ? '#505' : '#000'} emissiveIntensity={isLit ? 0.2 : 0} roughness={0.3} />
+        <meshStandardMaterial color={isLit ? '#ff00ff' : '#550055'} emissive={isLit ? '#ff00ff' : '#000'} emissiveIntensity={isLit ? 0.5 : 0} roughness={0.3} />
       </mesh>
     </group>
   )
@@ -181,14 +184,65 @@ const MagicParticles = () => {
     const group = useRef<THREE.Group>(null)
     useFrame(({ clock }) => {
         if (group.current) {
-            group.current.rotation.y = clock.getElapsedTime() * 0.1
+            group.current.rotation.y = clock.getElapsedTime() * 0.05
         }
     })
     return (
         <group ref={group}>
-            <ThreeSparkles count={100} scale={[8, 10, 8]} size={2} speed={0.4} opacity={0.5} color="#ffd700" noise={1} />
+            {/* 金色粒子 - 内层 */}
+            <ThreeSparkles count={150} scale={[4, 8, 4]} size={3} speed={0.4} opacity={0.8} color="#ffd700" noise={0.2} />
+            {/* 金色粒子 - 外层 */}
+            <ThreeSparkles count={100} scale={[8, 10, 8]} size={5} speed={0.2} opacity={0.5} color="#ffa500" noise={0.5} />
         </group>
     )
+}
+
+// 金色螺旋光效
+const GoldenSpiral = () => {
+  const count = 100
+  const positions = useMemo(() => {
+    const pos = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      const t = i / count
+      const angle = t * Math.PI * 10 // 5 circles
+      const radius = 2.5 * (1 - t * 0.6) + 0.5 // tapering to top
+      const y = t * 7 - 3 // height from -3 to 4
+      
+      pos[i * 3] = Math.cos(angle) * radius
+      pos[i * 3 + 1] = y
+      pos[i * 3 + 2] = Math.sin(angle) * radius
+    }
+    return pos
+  }, [])
+
+  const pointsRef = useRef<THREE.Points>(null)
+  
+  useFrame((state) => {
+    if (pointsRef.current) {
+        pointsRef.current.rotation.y = state.clock.elapsedTime * 0.2
+        pointsRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.2
+    }
+  })
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          args={[positions, 3]}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.15}
+        color="#ffd700"
+        transparent
+        opacity={0.8}
+        blending={THREE.AdditiveBlending}
+        sizeAttenuation
+        depthWrite={false}
+      />
+    </points>
+  )
 }
 
 const Reindeer = () => {
@@ -321,11 +375,8 @@ export const Step5ChristmasTree = () => {
         <p className="text-white mt-2 text-lg drop-shadow-md font-semibold">点击星星、树层和礼物，唤醒新年的魔法</p>
       </div>
 
-      <Canvas shadows camera={{ position: [0, 2, 12], fov: 45 }}>
+      <Canvas shadows camera={{ position: [0, 0, 14], fov: 45 }}>
         {/* 环境设置 */}
-        {/* 透明背景，让 CSS 渐变显示出来 */}
-        {/* <color attach="background" args={['#1e293b']} /> */}
-        {/* 雾气颜色调整为深蓝色以匹配背景 */}
         <fog attach="fog" args={['#2a5298', 10, 50]} /> 
         <ambientLight intensity={1.5} color="#ffffff" />
         <hemisphereLight args={['#87CEEB', '#4B0082', 1.5]} />
@@ -383,8 +434,19 @@ export const Step5ChristmasTree = () => {
             {/* Environment Effects */}
             <SnowFloor />
             <MagicParticles />
+            <GoldenSpiral />
             <ThreeSparkles count={300} scale={[20, 20, 20]} size={1.2} speed={0.2} opacity={0.6} color="#fff" />
         </group>
+
+        {/* Post Processing for Glow Effect */}
+        <EffectComposer>
+            <Bloom 
+                luminanceThreshold={0.5} // 阈值，只有亮度超过这个值的像素才会发光
+                mipmapBlur // 更好的模糊质量
+                intensity={1.5} // 发光强度
+                radius={0.6} // 光晕半径
+            />
+        </EffectComposer>
 
         <OrbitControls 
             enableZoom={false} 
@@ -392,6 +454,7 @@ export const Step5ChristmasTree = () => {
             minPolarAngle={Math.PI / 3} 
             maxAzimuthAngle={Math.PI / 4}
             minAzimuthAngle={-Math.PI / 4}
+            target={[0, 0, 0]} // 确保视角中心是原点
         />
       </Canvas>
       
