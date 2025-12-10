@@ -12,6 +12,42 @@ const Letters = [
   { id: 'K', label: 'K' },
 ]
 
+const Particle = ({ delay }: { delay: number }) => {
+  const angle = Math.random() * 360
+  const distance = Math.random() * 100 + 50
+  const duration = Math.random() * 0.5 + 0.5
+  
+  return (
+    <motion.div
+      initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
+      animate={{ 
+        x: Math.cos(angle * Math.PI / 180) * distance, 
+        y: Math.sin(angle * Math.PI / 180) * distance, 
+        opacity: 0,
+        scale: Math.random() * 0.5 + 0.5 
+      }}
+      transition={{ duration, ease: "easeOut", delay }}
+      className="absolute w-2 h-2 rounded-full bg-linear-to-r from-yellow-300 to-amber-500 shadow-[0_0_10px_#FFD700]"
+    />
+  )
+}
+
+const Explosion = () => {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
+      {[...Array(12)].map((_, i) => (
+        <Particle key={i} delay={i * 0.02} />
+      ))}
+      <motion.div
+        initial={{ scale: 0, opacity: 0.5 }}
+        animate={{ scale: 1.5, opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        className="absolute w-32 h-32 rounded-full border-2 border-yellow-400"
+      />
+    </div>
+  )
+}
+
 export const Step2InjectGoodLuck = () => {
   const { setStep, unlockStep } = useStore()
   const [litLetters, setLitLetters] = useState<string[]>([])
@@ -28,15 +64,49 @@ export const Step2InjectGoodLuck = () => {
     const x = (rect.left + rect.width / 2) / window.innerWidth
     const y = (rect.top + rect.height / 2) / window.innerHeight
     
-    confetti({
-      particleCount: 30,
+    // Enhanced confetti
+    const count = 200;
+    const defaults = {
+      origin: { x, y }
+    };
+
+    function fire(particleRatio: number, opts: any) {
+      confetti({
+        ...defaults,
+        ...opts,
+        particleCount: Math.floor(count * particleRatio)
+      });
+    }
+
+    fire(0.25, {
+      spread: 26,
+      startVelocity: 55,
+      colors: ['#FFD700', '#FFA500'],
+      scalar: 1.2
+    });
+    fire(0.2, {
       spread: 60,
-      origin: { x, y },
-      colors: ['#FFD700', '#FFA500', '#FFFFFF'],
-      gravity: 0.8,
+      colors: ['#FFFFFF', '#FFD700'],
+      scalar: 0.8
+    });
+    fire(0.35, {
+      spread: 100,
+      decay: 0.91,
       scalar: 0.8,
-      ticks: 60
-    })
+      colors: ['#FFA500', '#FFD700']
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 25,
+      decay: 0.92,
+      scalar: 1.2,
+      colors: ['#FFFFFF']
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 45,
+      colors: ['#FFD700']
+    });
 
     if (newLit.length === Letters.length) {
       handleComplete()
@@ -92,28 +162,32 @@ export const Step2InjectGoodLuck = () => {
         {Letters.map((item) => {
           const isLit = litLetters.includes(item.id)
           return (
-            <motion.div
-              key={item.id}
-              onClick={(e) => handleLetterClick(item.id, e)}
-              whileHover={{ scale: isLit ? 1.1 : 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              animate={{
-                textShadow: isLit 
-                  ? "0 0 20px #FFD700, 0 0 40px #FFA500, 0 0 60px #FF0000" 
-                  : "0 0 0px transparent",
-                color: isLit ? "#FFF" : "rgba(255, 215, 0, 0.2)",
-                scale: isLit ? [1, 1.2, 1] : 1,
-              }}
-              className={`
-                text-[5rem] md:text-[8rem] font-black cursor-pointer select-none transition-colors duration-300
-                ${!isLit && "hover:text-yellow-500/40"}
-              `}
-              style={{
-                WebkitTextStroke: isLit ? "none" : "2px rgba(234, 179, 8, 0.5)",
-              }}
-            >
-              {item.label}
-            </motion.div>
+            <div key={item.id} className="relative">
+              <motion.div
+                onClick={(e) => handleLetterClick(item.id, e)}
+                whileHover={{ scale: isLit ? 1.1 : 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                animate={{
+                  textShadow: isLit 
+                    ? "0 0 30px #FFD700, 0 0 60px #FFA500, 0 0 90px #FF8C00" 
+                    : "0 0 0px transparent",
+                  color: isLit ? "#FFD700" : "rgba(255, 255, 255, 0.9)",
+                  scale: isLit ? [1, 1.2, 1] : 1,
+                  filter: isLit ? "brightness(1.2)" : "brightness(1)"
+                }}
+                transition={{ duration: 0.3 }}
+                className={`
+                  text-[5rem] md:text-[8rem] font-black cursor-pointer select-none transition-all duration-500
+                  ${!isLit && "hover:text-white hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"}
+                `}
+                style={{
+                  WebkitTextStroke: isLit ? "none" : "3px rgba(255, 255, 255, 0.5)",
+                }}
+              >
+                {item.label}
+              </motion.div>
+              {isLit && <Explosion />}
+            </div>
           )
         })}
       </div>

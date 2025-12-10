@@ -410,7 +410,7 @@ const SnowFloor = () => {
         depthScale={1.2}
         minDepthThreshold={0.4}
         maxDepthThreshold={1.4}
-        color="#f0f0f0"
+        color="#313131"
         metalness={0.1}
         mirror={0}
       />
