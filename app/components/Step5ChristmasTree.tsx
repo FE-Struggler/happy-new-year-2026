@@ -166,11 +166,11 @@ const Star = ({ isLit, onClick }: any) => {
       <mesh ref={mesh} castShadow>
         <octahedronGeometry args={[0.6, 0]} />
         <meshStandardMaterial
-          color={isLit ? '#ffd700' : '#887000'}
-          emissive={isLit ? '#ffd700' : '#000000'}
-          emissiveIntensity={isLit ? 4 : 0}
-          metalness={1}
-          roughness={0}
+          color={isLit ? '#ffd700' : '#4a4411'}
+          emissive={isLit ? '#ffd700' : '#2e2a0d'}
+          emissiveIntensity={isLit ? 4 : 0.2}
+          metalness={isLit ? 1 : 0.6}
+          roughness={isLit ? 0 : 0.4}
         />
       </mesh>
       {isLit && (
@@ -410,7 +410,7 @@ const SnowFloor = () => {
         depthScale={1.2}
         minDepthThreshold={0.4}
         maxDepthThreshold={1.4}
-        color="#313131"
+        color="#3d3d3d"
         metalness={0.1}
         mirror={0}
       />
